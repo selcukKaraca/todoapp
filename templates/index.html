@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block navigation %}
+
+<br>
+<h3>IP: {{ IP }} </h3>
+
+<h3>HostName: {{ hname }} </h3>
+
+{% endblock %}
+
+{% block article %}
+
+<form action='addTask' method='post'>
+    <input type="text" name="taskName" value="">
+    <input type="submit" name="addTask" value="add Task">
+</form>
+<br>
+<hr>
+<br>
+<table>
+    <tr>
+        <th> Task </th>
+        <th> Date Time </th>
+        <th> Action </th>
+    </tr>
+
+    {% for task in tasks %}
+        <tr>
+            <td> {{ task.task_name }}</td>
+            <td> {{ task.task_date }}</td>
+            <td> <a href='/delete/{{ task.id }}'>Delete</a>
+            <br>
+             <a href='/update/{{ task.id }}'>Update</a> </td> 
+        </tr>
+
+    {% endfor %}
+
+</table>
+
+{% endblock %}

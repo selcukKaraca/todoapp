@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{%  block article %}
+
+<h3>Lutfen yeni degeri giriniz....</h3>
+<form action="/updater/{{ task.id }}" method="post">
+
+    <input type="text" name="taskText" value="{{ task.task_name }}" >
+   
+    <input type="submit" name="update"  value="update" > 
+</form>
+
+{% endblock %}
+
