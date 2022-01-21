@@ -1,4 +1,2 @@
-__pycache__
-env
-app2.py
-my.db
+flasky
+secrets
