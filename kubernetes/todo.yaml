@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: todo-secret
+type: Opaque
+stringData:
+  username: taskuser
+  password: taskpass
+  dbname: TASKDB
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: todo
+  name: todo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: todo
+  
+  template:
+    metadata:
+      labels:
+        app: todo
+    spec:
+      containers:
+      - image: docker.io/mskaraca/todoapp:v1.0
+        name: todo
+        env:
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: todo-secret
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: todo-secret
+              key: password
+        - name: DBNAME
+          valueFrom:
+            secretKeyRef:
+              name: todo-secret
+              key: dbname
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+   name: todo
+spec:
+   type: LoadBalancer
+   selector:
+      app: todo
+   ports:
+   - port: 5000

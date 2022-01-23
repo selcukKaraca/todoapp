@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tododb-secret
+type: Opaque
+stringData:
+  MYSQL_ROOT_PASSWORD: abrakadabra
+  MYSQL_DATABASE: TASKDB
+  MYSQL_USER: taskuser
+  MYSQL_PASSWORD: taskpass
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+spec:
+  storageClassName: gp2
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tododb
+  name: tododb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tododb
+  
+  template:
+    metadata:
+      labels:
+        app: tododb
+    spec:
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+      containers:
+      - image: docker.io/mariadb:10.7
+        name: tododb
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: tododb-secret
+              key: MYSQL_ROOT_PASSWORD
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: tododb-secret
+              key: MYSQL_USER
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: tododb-secret
+              key: MYSQL_PASSWORD
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: tododb-secret
+              key: MYSQL_DATABASE
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+   name: taskdb
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: tododb
+  clusterIP: None
+   

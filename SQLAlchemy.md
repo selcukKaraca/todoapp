@@ -9,6 +9,9 @@ This works according to DBAPI /Database API) specifictation. mysql is the lang a
 
 - ORM: Object relational Mapping ise a feature of sqlAlchemy. it provides us with working with python objects and it automatically constructs sql statements for us.
 ```shell
+from sqlaalchemy.ext.declerative import decarative_base
+Base=declarative_base()
+
 class Product(Base):
    #this object will be mapped to this table..
    __tablename__='products'
@@ -25,7 +28,7 @@ engine=create_engine(...)
 Session=sessionmaker(bind=engine)
 session=Session()
 ```
-- at the end to make insetactionsions:
+- at the end to make actionsions:
 ```shell
 #query
 products=session.query(Product).all()
@@ -47,3 +50,9 @@ oldp.title='tennis ball size 2'
 session.commit()
 sesion.close()
 ```
+
+shortly;  
+create a DB engine to connect  
+use this engine to create session  
+create a table object from declerative_base class  
+Now use session.query(table) to interact with the DB

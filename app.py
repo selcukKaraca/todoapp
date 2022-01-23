@@ -61,10 +61,10 @@ def createDB():
             #create table if not exists..
             Base.metadata.create_all(taskdb)
          except Exception as e:
-            return  f"DB baglantisinda hata alindi..Error {e}"
+            return  f"DB error. \nError message: {e}"
          return "db created"
      else:
-         return "kodu hatalı girdiniz..."
+         return "code is incorrect..."
 
 
 #if a new task added with add task then we add it to the ORM represantion of the table
@@ -73,7 +73,7 @@ def addTask():
   try:  
     tname=request.form.get("taskName")
     if tname=='':
-        return "bos kayit girilemez.."
+        return "Empty record is not allowed.."
     newTask=Todo(task_name=tname)
     session.add(newTask)
     session.commit()
@@ -81,7 +81,7 @@ def addTask():
     return redirect('/')
   except Exception as e:
   
-    return f"DB ile ilgili bir sorun olustu. \nHata mesajı {e}"
+    return f"There is a problem with DB. \nError message: {e}"
 
 @app.route('/update/<int:id>',methods=['GET','POST'])
 def updateForm(id):
