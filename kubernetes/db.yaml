@@ -3,17 +3,20 @@ kind: Secret
 metadata:
   name: tododb-secret
 type: Opaque
+#here, instead of stringData we may use data and encoded base64 values. for the sake of simplicity we used stringData
 stringData:
   MYSQL_ROOT_PASSWORD: abrakadabra
   MYSQL_DATABASE: TASKDB
   MYSQL_USER: taskuser
   MYSQL_PASSWORD: taskpass
 ---
+#This will work with redhat sandbox environment. if you run this on another platform use another SC or use hostPath
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-pv-claim
 spec:
+  #for auto provisioning of PVs we will need a SC. write it here..
   storageClassName: gp2
   accessModes:
     - ReadWriteOnce
@@ -23,7 +26,8 @@ spec:
 
 ---
 apiVersion: apps/v1
-kind: Deployment
+# we selected statefulset as the type. It is more approprite for persistent data storage needs
+kind: StatefulSet
 metadata:
   labels:
     app: tododb
@@ -44,11 +48,14 @@ spec:
         persistentVolumeClaim:
           claimName: mysql-pv-claim
       containers:
+      #normally we do not need to specify docker.io. but if we run it redhat sandbox, it defaults to quay.io and we need to specify it.
       - image: docker.io/mariadb:10.7
         name: tododb
         volumeMounts:
         - name: mysql-persistent-storage
+          #here is the default dir. where mariadb wrtes its db files..
           mountPath: /var/lib/mysql
+        #we mount secrets as env variables and inside our app, we initialize our variables from shell environment
         env:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
@@ -83,5 +90,6 @@ spec:
   - port: 3306
   selector:
     app: tododb
+  #this is a headless service. so clusterIP will be none. communicaton goes with DNS records not clusterIP..
   clusterIP: None
    

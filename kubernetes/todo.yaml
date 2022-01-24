@@ -3,6 +3,7 @@ kind: Secret
 metadata:
   name: todo-secret
 type: Opaque
+#here, instead of stringData we may use data and encoded base64 values. for the sake of simplicity we used stringData
 stringData:
   username: taskuser
   password: taskpass
@@ -29,6 +30,7 @@ spec:
       containers:
       - image: docker.io/mskaraca/todoapp:v1.0
         name: todo
+        #we mount secrets as env variables and inside our app, we initialize our variables from shell environment
         env:
         - name: USERNAME
           valueFrom:
@@ -54,8 +56,11 @@ kind: Service
 metadata:
    name: todo
 spec:
+   #if you have an ingress controller, you may use ClusterIP type here and access service over ingress resource (you should define it)
    type: LoadBalancer
    selector:
       app: todo
    ports:
-   - port: 5000
+   # service will listen in port 80 and forward requests to port 5000, flask def port..
+   - port: 80
+     targetPort: 5000
