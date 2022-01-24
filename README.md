@@ -43,7 +43,9 @@ firstly, select "Install/Reset Database" from left side. when a secret code is a
 
 1. This app is designed to run in k8s. To deploy in k8s, look at kubernetes folder. It includes all resource definitions in 2 files. todoapp.yaml for web app and tododb.yaml for mariadb
 
-3. tu run in k8s,
+One thing to consider is PVC definition. In db.yaml file, we assumed that you wil run this in redhat sandbox envronment. If you run it in another platform, please correct storageClass. If you do not have a autorpvisioner component, you may use hostPath. We leave it as an exercise to you.. :) 
+
+2. to run in k8s,
 
 ```shell
 kubectl apply -f taskdb.yaml
