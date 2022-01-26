@@ -19,14 +19,7 @@ docker inspect <Container ID from previous> | grep "IPAddress"
 
 ```
 2.
- you can pull container image from docker.io/mskaraca/todoapp:v1.0 
- 
- or build container image yourself by first clonening this github repo and then building the image. 
-```shell
-github clone https://github.com/selcukKaraca/todoapp.git
-docker image build -t todoapp:v1.0 .
-```
-OR shortly run the container
+ run the todoapp container
 ```shell
 docker run -e USERNAME=taskuser -e PASSWORD=taskpass -e DBNAME=TASKDB -d --rm --name todoapp -p 5000:5000 --add-host=taskdb:<Above_IPAddress> mskaraca/todoapp:v1.0
 
@@ -43,7 +36,7 @@ firstly, select "Install/Reset Database" from left side. when a secret code is a
 
 1. This app is designed to run in k8s. To deploy in k8s, look at kubernetes folder. It includes all resource definitions in 2 files. todoapp.yaml for web app and tododb.yaml for mariadb
 
-One thing to consider is PVC definition. In db.yaml file, we assumed that you wil run this in redhat sandbox envronment. If you run it in another platform, please correct storageClass. If you do not have a autorpvisioner component, you may use hostPath. We leave it as an exercise to you.. :) 
+One thing to consider is PVC definition. In db.yaml file, we assumed that you wil run this in redhat sandbox envronment. If you run it in another platform, please correct storageClass. If you do not have a autorprovisioner component, you may use hostPath. We leave it as an exercise to you.. :) 
 
 2. to run in k8s,
 
@@ -51,19 +44,42 @@ One thing to consider is PVC definition. In db.yaml file, we assumed that you wi
 kubectl apply -f taskdb.yaml
 kubectl apply -f  todoapp.yaml 
 ```
+To access application, we need to find external IP
+```shell
+kubctl get svc todo
+```
+Now go to http://externalIP:5000
+
+
+
+
 
 ## MariaDB configuration
-    when run in k8s, mariadb can initialize itself by some predefined environment variables. we followed this way. if you want to create mariadb and DB  yourself you can use the following commands..
+ when run in k8s, mariadb can initialize itself by some predefined environment variables. we followed this way. if you want to create mariadb and DB  yourself you can use the following commands..
 
-    ```shell
-    #after ssh to the mariadb server..
-    mysql -u root -p
-    create database TASKDB;
-    grant all privileges on TASKDB.* to 'taskuser'@'%' identified by 'taskpass';
-    flush privileges;
-    ```
-## Building docker image and pushing it to docker.io
- to put your docker image in hub.docker.com. (Note docker.io can be accessed from hub.docker.com)
+ ```shell
+#after ssh to the mariadb server..
+mysql -u root -p
+create database TASKDB;
+grant all privileges on TASKDB.* to 'taskuser'@'%' identified by 'taskpass';
+flush privileges;
+```
+## Docker image
+
+
+you can pull container image from docker.io/mskaraca/todoapp:v1.0 
+
+```shell
+docker pull mskaraca/todoapp:v1.0
+```
+
+or build container image yourself by first clonening this github repo and then building the image. 
+```shell
+github clone https://github.com/selcukKaraca/todoapp.git
+docker image build -t todoapp:v1.0 .
+```
+
+To put this docker image in hub.docker.com. (Note docker.io can be accessed from hub.docker.com)
 
 1. docker image build -t todoapp:v1.0
 2. docker login --username=yourUserName  
